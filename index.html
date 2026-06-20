@@ -317,6 +317,25 @@ input[type=range] { -webkit-appearance:none; appearance:none }
 
   /* ── Style cat strip ── */
   #style-cat-strip { flex-shrink:0 }
+
+  /* ── Hide desktop welcome on mobile ── */
+  #welcome-overlay { display:none !important }
+
+  /* ── Fix overlay hidden state (ID specificity fix) ── */
+  #mobile-upload-overlay.hidden { display:none !important }
+
+  /* ── Style category accordion visibility ── */
+  #right-panel .accordion { display:none }
+  #right-panel .accordion.mobile-cat-active { display:block }
+  #right-panel .accordion-header { display:none !important }
+  #right-panel .accordion-body {
+    max-height:none !important; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:0 14px 14px !important;
+  }
+  #right-panel .panel-scroll {
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
 }
 
 
