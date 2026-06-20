@@ -213,27 +213,141 @@ input[type=range] { -webkit-appearance:none; appearance:none }
 }
 /* Mobile */
 @media(max-width:767px) {
-  #main-area { flex-direction:column }
-  #left-panel, #right-panel { display:none }
-  #left-panel.mobile-active, #right-panel.mobile-active {
-    display:flex; flex-direction:column; flex:1; overflow:hidden;
-    background: var(--glass);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-  }
-  #center-panel { display:flex; flex-direction:column; overflow:hidden }
-  #center-panel.mobile-hidden { display:none }
-  #video-area-wrap { flex:0 0 auto }
-  #mobile-tabs {
-    display:flex;
-    background: var(--glass);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-top: 1px solid var(--glass-border);
-    flex-shrink:0;
-  }
+  /* ── App Shell ── */
+  #main-area { flex-direction:column; overflow:hidden; position:relative }
+  #left-panel, #right-panel { display:none }          /* hidden from flow */
+  #center-panel { display:flex; flex-direction:column; flex-shrink:0 }
+  #center-panel.mobile-hidden { display:none }        /* unused but kept */
   #timeline-panel { display:none }
+
+  /* ── Video area: always-visible 16:9 preview ── */
+  #video-area-wrap {
+    width:100%;
+    height: calc(100vw * 9 / 16);
+    max-height: 44vh;
+    flex-shrink: 0;
+    background: #000;
+    position: relative;
+  }
+
+  /* ── Slim video controls on mobile ── */
+  #video-controls { padding:4px 8px }
+  #seek-bar-wrap { height:18px }
+  #volume-wrap, .speed-wrap { display:none }
+
+  /* ── Header: smaller on mobile ── */
+  #header { height:44px; padding:0 10px }
+  #project-name { display:none }
+  #logo { font-size:15px }
+  #logo svg { width:22px; height:22px }
+  .header-btn span { display:none }
+  .header-btn { padding:6px 8px }
+
+  /* ── Mobile backdrop (behind sheet) ── */
+  #mobile-backdrop {
+    position:fixed; inset:0; z-index:199;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    display:none; opacity:0;
+    transition:opacity .3s ease;
+  }
+  #mobile-backdrop.visible { display:block; opacity:1 }
+
+  /* ── Panel → bottom sheet ── */
+  #left-panel, #right-panel {
+    position:fixed;
+    left:0; right:0;
+    bottom:0;
+    height: 68vh;
+    max-height: calc(100vh - 120px);
+    z-index:200;
+    display:flex !important;
+    flex-direction:column;
+    border-radius:20px 20px 0 0;
+    background: rgba(14,14,28,0.97);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-border);
+    border-bottom:none;
+    transform:translateY(110%);
+    transition:transform .35s cubic-bezier(.4,0,.2,1);
+    will-change:transform;
+    overflow:hidden;
+    padding-bottom:calc(60px + var(--safe-b));
+  }
+  #left-panel.sheet-open, #right-panel.sheet-open {
+    transform:translateY(0);
+    box-shadow:0 -8px 40px rgba(0,0,0,0.6), 0 -2px 0 rgba(124,108,247,0.2);
+  }
+
+  /* ── Sheet drag handle ── */
+  .sheet-drag-handle {
+    display:flex !important;
+    justify-content:center; align-items:center;
+    padding:10px 0 6px; flex-shrink:0; cursor:grab;
+    touch-action:none; user-select:none;
+  }
+  .sheet-handle-bar {
+    width:36px; height:4px; border-radius:2px;
+    background:rgba(255,255,255,0.2);
+  }
+
+  /* ── Tab bar ── */
+  #mobile-tabs {
+    position:fixed;
+    bottom:0; left:0; right:0;
+    display:flex !important;
+    background: rgba(10,10,22,0.97);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    border-top:1px solid var(--glass-border);
+    z-index:300;
+    padding-bottom:var(--safe-b);
+    height:calc(60px + var(--safe-b));
+  }
+  .mobile-tab { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:6px 4px 4px; gap:2px; font-size:9px; font-weight:600; letter-spacing:0.04em;
+    color:var(--text-muted); border-top:2px solid transparent; transition:all .15s ease; -webkit-tap-highlight-color:transparent }
+  .mobile-tab svg { width:20px; height:20px }
+  .mobile-tab.active { color:var(--accent-2); border-top-color:var(--accent) }
+  .mobile-tab:active { opacity:0.6; transform:scale(0.9) }
+
+  /* ── Centre "+" tab ── */
+  .mobile-tab.add-tab { flex:0 0 72px }
+  .mobile-tab.add-tab .tab-add-circle {
+    width:44px; height:44px; border-radius:50%;
+    background:var(--grad-accent);
+    box-shadow:var(--shadow-btn);
+    display:flex; align-items:center; justify-content:center;
+    margin-top:-14px;
+  }
+  .mobile-tab.add-tab .tab-add-circle svg { width:22px; height:22px; color:#fff }
+  .mobile-tab.add-tab .tab-label { font-size:8px; margin-top:1px; color:var(--text-muted) }
+
+  /* ── Spacer so content isn't hidden under tab bar ── */
+  #mobile-bottom-spacer { display:block !important }
+
+  /* ── Mobile upload overlay ── */
+  #mobile-upload-overlay {
+    display:flex;
+    position:fixed; inset:0; z-index:400;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(6,6,15,0.98);
+    gap:20px; padding:32px 24px;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+
+  /* ── Upload zone on mobile: simpler ── */
+  #drop-area { padding:28px 20px }
+  #drop-area h2 { font-size:16px }
 }
+
+
+/* Base rule: hide mobile-only elements on desktop */
+.sheet-drag-handle { display:none }
+#mobile-backdrop { display:none }
+#mobile-upload-overlay { display:none }
+#mobile-bottom-spacer { display:none }
 
 #video-area-wrap { flex:1; display:flex; flex-direction:column; overflow:hidden; background:#000; position:relative }
 #timeline-panel {
@@ -1809,6 +1923,10 @@ input[type=range]::-webkit-slider-runnable-track {
 
     <!-- LEFT PANEL: Caption Editor -->
     <div id="left-panel">
+      <!-- Sheet drag handle (mobile only) -->
+      <div class="sheet-drag-handle" id="left-panel-handle">
+        <div class="sheet-handle-bar"></div>
+      </div>
       <div class="panel-header">
         <span class="panel-title">Captions</span>
         <button class="panel-action" id="btn-find-toggle" title="Find & Replace (Ctrl+F)">
@@ -1909,6 +2027,7 @@ input[type=range]::-webkit-slider-runnable-track {
         <div id="video-container">
           <!-- Upload Zone -->
           <div id="upload-zone">
+            <!-- Desktop drop area -->
             <div id="drop-area" role="button" tabindex="0" aria-label="Upload video">
               <div class="upload-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1932,7 +2051,27 @@ input[type=range]::-webkit-slider-runnable-track {
                 </button>
               </div>
             </div>
-            <input type="file" id="file-input" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/avi,video/*" capture="environment">
+            <input type="file" id="file-input" accept="video/*">
+          </div>
+
+          <!-- Mobile full-screen upload overlay (shown only on mobile, hidden after video loads) -->
+          <div id="mobile-upload-overlay" class="hidden">
+            <div style="width:80px;height:80px;border-radius:50%;background:var(--grad-accent);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-btn),0 0 0 16px rgba(124,108,247,0.08);margin-bottom:8px">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 10l-7 7M15 17V10H8"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px">CaptionX</div>
+            <div style="font-size:14px;color:var(--text-secondary);text-align:center;line-height:1.5;max-width:260px">Add captions to your videos. Export as SRT, VTT or share directly.</div>
+            <button id="btn-mobile-photos" style="margin-top:16px;width:100%;max-width:280px;padding:16px 24px;border-radius:16px;background:var(--grad-accent);color:#fff;font-size:16px;font-weight:700;border:none;box-shadow:var(--shadow-btn);display:flex;align-items:center;justify-content:center;gap:10px;-webkit-tap-highlight-color:transparent">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              Choose from Photos
+            </button>
+            <button id="btn-mobile-camera" style="margin-top:10px;width:100%;max-width:280px;padding:14px 24px;border-radius:16px;background:rgba(255,255,255,0.07);color:var(--text-primary);font-size:15px;font-weight:600;border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;gap:10px;-webkit-tap-highlight-color:transparent">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="3"/><path d="M4 7h2l2-3h8l2 3h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg>
+              Record Video
+            </button>
+            <div style="margin-top:20px;font-size:11px;color:var(--text-muted);text-align:center">MP4 · MOV · WebM · M4V</div>
+            <!-- hidden camera-capture input -->
+            <input type="file" id="file-input-camera" accept="video/*" capture="environment" style="display:none">
           </div>
           <!-- Video Element -->
           <video id="video-el" playsinline webkit-playsinline preload="metadata" style="display:none"></video>
@@ -1997,6 +2136,10 @@ input[type=range]::-webkit-slider-runnable-track {
 
     <!-- RIGHT PANEL: Style Controls -->
     <div id="right-panel">
+      <!-- Sheet drag handle (mobile only) -->
+      <div class="sheet-drag-handle" id="right-panel-handle">
+        <div class="sheet-handle-bar"></div>
+      </div>
       <div class="panel-header">
         <span class="panel-title">Style</span>
       </div>
@@ -2340,21 +2483,34 @@ input[type=range]::-webkit-slider-runnable-track {
   </div><!-- /main-area -->
 
   <!-- Mobile Tab Bar -->
+  <!-- Mobile Backdrop -->
+  <div id="mobile-backdrop" onclick="MobileSheet.close()"></div>
+
+  <!-- Mobile bottom spacer (keeps content above tab bar) -->
+  <div id="mobile-bottom-spacer" style="display:none;height:calc(60px + env(safe-area-inset-bottom,0px));flex-shrink:0"></div>
+
+  <!-- Mobile Tab Bar -->
   <div id="mobile-tabs">
-    <button class="mobile-tab active" data-mtab="captions">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 12a2 2 0 0 1-2 2H5l-3 3V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8z"/></svg>
+    <button class="mobile-tab" data-mtab="upload" id="mtab-upload">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 13V4M7 7l3-3 3 3"/><path d="M3 14v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg>
+      Upload
+    </button>
+    <button class="mobile-tab" data-mtab="captions" id="mtab-captions">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 10a2 2 0 0 1-2 2H6l-3 3V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v6z"/></svg>
       Captions
     </button>
-    <button class="mobile-tab" data-mtab="style">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"/></svg>
+    <button class="mobile-tab add-tab" id="mtab-add">
+      <div class="tab-add-circle">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 4v12M4 10h12"/></svg>
+      </div>
+      <span class="tab-label">Add</span>
+    </button>
+    <button class="mobile-tab" data-mtab="style" id="mtab-style">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17l3-3 9-9-3-3-9 9-3 3 3 3z"/><path d="M14 5l2 2"/></svg>
       Style
     </button>
-    <button class="mobile-tab" data-mtab="timeline">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 10h16M6 6v8M10 4v12M14 6v8"/></svg>
-      Timeline
-    </button>
-    <button class="mobile-tab" data-mtab="export">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v10M7 9l3 3 3-3M3 14v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg>
+    <button class="mobile-tab" data-mtab="export" id="mtab-export">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2v10M7 9l3 3 3-3M3 15v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg>
       Export
     </button>
   </div>
@@ -2754,23 +2910,35 @@ const UI = {
   },
 
   initMobileTabs() {
-    document.querySelectorAll('.mobile-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.mobile-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const mtab = tab.dataset.mtab;
-        const lp = document.getElementById('left-panel');
-        const rp = document.getElementById('right-panel');
-        const cp = document.getElementById('center-panel');
-        const tp = document.getElementById('timeline-panel');
-        lp.classList.remove('mobile-active'); rp.classList.remove('mobile-active');
-        cp.classList.remove('mobile-hidden');
-        if (tp) tp.style.display = 'none';
-        if (mtab === 'captions') { lp.classList.add('mobile-active'); cp.classList.add('mobile-hidden'); }
-        else if (mtab === 'style') { rp.classList.add('mobile-active'); cp.classList.add('mobile-hidden'); }
-        else if (mtab === 'timeline') { if (tp) { tp.style.display = 'block'; setTimeout(() => Timeline.resize(), 50); } }
-        else if (mtab === 'export') { UI.showModal('export-modal'); }
-      });
+    // Only wire up on mobile; desktop ignores tab-bar
+    const isMobile = () => window.innerWidth <= 767;
+
+    document.getElementById('mtab-captions')?.addEventListener('click', () => {
+      if (!isMobile()) return;
+      MobileSheet.toggle('left-panel', 'mtab-captions');
+    });
+    document.getElementById('mtab-style')?.addEventListener('click', () => {
+      if (!isMobile()) return;
+      MobileSheet.toggle('right-panel', 'mtab-style');
+    });
+    document.getElementById('mtab-add')?.addEventListener('click', () => {
+      if (!isMobile()) return;
+      MobileSheet.close();
+      CaptionManager.add();
+      CaptionEditor.render();
+      UI.showToast('Caption added at playhead', 'success');
+    });
+    document.getElementById('mtab-upload')?.addEventListener('click', () => {
+      if (!isMobile()) return;
+      MobileSheet.close();
+      // Always show the mobile overlay (works on iOS and Android)
+      const overlay = document.getElementById('mobile-upload-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+    });
+    document.getElementById('mtab-export')?.addEventListener('click', () => {
+      if (!isMobile()) return;
+      MobileSheet.close();
+      UI.showModal('export-modal');
     });
   }
 };
@@ -2831,12 +2999,15 @@ const VideoPlayer = {
     this.el.src = url;
     this.el.style.display = 'block';
     document.getElementById('upload-zone').classList.add('hidden');
+    document.getElementById('mobile-upload-overlay')?.classList.add('hidden');
     document.getElementById('video-controls').style.display = 'flex';
     document.getElementById('timeline-panel').style.display = 'block';
     State.videoLoaded = true;
     document.title = `CaptionX — ${file.name}`;
     document.getElementById('proj-name-input').value = file.name.replace(/\.[^.]+$/, '');
     setTimeout(() => Timeline.extractWaveform(), 500);
+    // Mobile: open captions sheet so user can start right away
+    if (window.innerWidth <= 767) setTimeout(() => MobileSheet.open('left-panel', 'mtab-captions'), 500);
   },
 
   loadVideoURL(url) {
@@ -5439,6 +5610,125 @@ const SampleVideo = {
   }
 };
 
+
+// =====================================================
+// MOBILE SHEET — CapCut-style bottom sheet manager
+// =====================================================
+const MobileSheet = {
+  current: null,       // 'left-panel' | 'right-panel' | null
+  currentTabId: null,  // active tab button id
+  _startY: 0,
+  _startTranslate: 0,
+  _panel: null,
+
+  open(panelId, tabId) {
+    if (this.current === panelId) return; // already open
+    this.close(true); // close without animation delay
+
+    const panel = document.getElementById(panelId);
+    const backdrop = document.getElementById('mobile-backdrop');
+    if (!panel || !backdrop) return;
+
+    panel.classList.add('sheet-open');
+    backdrop.classList.add('visible');
+    this.current = panelId;
+    this.currentTabId = tabId;
+    if (tabId) document.getElementById(tabId)?.classList.add('active');
+
+    // Resize timeline if relevant
+    if (panelId === 'left-panel') setTimeout(() => Timeline?.resize?.(), 60);
+  },
+
+  close(immediate) {
+    const panel = this.current ? document.getElementById(this.current) : null;
+    if (panel) {
+      panel.classList.remove('sheet-open');
+      if (immediate) panel.style.transition = 'none';
+      else setTimeout(() => { panel.style.transition = ''; }, 10);
+    }
+    document.getElementById('mobile-backdrop')?.classList.remove('visible');
+    if (this.currentTabId) document.getElementById(this.currentTabId)?.classList.remove('active');
+    this.current = null;
+    this.currentTabId = null;
+  },
+
+  toggle(panelId, tabId) {
+    if (this.current === panelId) { this.close(); }
+    else { this.open(panelId, tabId); }
+  },
+
+  // Touch drag-to-dismiss
+  initDrag(handleEl, panelId) {
+    if (!handleEl) return;
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+
+    handleEl.addEventListener('touchstart', (e) => {
+      this._panel = panel;
+      this._startY = e.touches[0].clientY;
+      this._startTranslate = 0;
+      panel.style.transition = 'none';
+    }, { passive:true });
+
+    handleEl.addEventListener('touchmove', (e) => {
+      if (!this._panel) return;
+      const dy = e.touches[0].clientY - this._startY;
+      if (dy > 0) {
+        panel.style.transform = `translateY(${dy}px)`;
+        // Fade backdrop
+        const prog = Math.max(0, 1 - dy / 200);
+        const bd = document.getElementById('mobile-backdrop');
+        if (bd) bd.style.opacity = prog;
+      }
+    }, { passive:true });
+
+    handleEl.addEventListener('touchend', (e) => {
+      if (!this._panel) return;
+      const dy = e.changedTouches[0].clientY - this._startY;
+      panel.style.transition = '';
+      if (dy > 100) {
+        this.close();
+      } else {
+        panel.style.transform = '';
+        const bd = document.getElementById('mobile-backdrop');
+        if (bd) bd.style.opacity = '';
+      }
+      this._panel = null;
+    }, { passive:true });
+  },
+
+  init() {
+    this.initDrag(document.getElementById('left-panel-handle'),  'left-panel');
+    this.initDrag(document.getElementById('right-panel-handle'), 'right-panel');
+
+    // iOS mobile upload overlay buttons
+    const photosBtn = document.getElementById('btn-mobile-photos');
+    const cameraBtn = document.getElementById('btn-mobile-camera');
+    const overlay   = document.getElementById('mobile-upload-overlay');
+    const fileInput = document.getElementById('file-input');
+    const camInput  = document.getElementById('file-input-camera');
+
+    if (photosBtn && fileInput) {
+      photosBtn.addEventListener('click', () => { fileInput.click(); });
+    }
+    if (cameraBtn && camInput) {
+      cameraBtn.addEventListener('click', () => { camInput.click(); });
+    }
+
+    // Camera input feeds into same handler as main file input
+    if (camInput) {
+      camInput.addEventListener('change', () => {
+        if (camInput.files[0]) Uploader.handleFile(camInput.files[0]);
+      });
+    }
+
+    // Show mobile overlay on ALL mobile when no video loaded
+    if (window.innerWidth <= 767) {
+      overlay?.classList.remove('hidden');
+    }
+  }
+};
+
 // =====================================================
 // APP INIT
 // =====================================================
@@ -5541,6 +5831,7 @@ const App = {
       if (el) el.addEventListener('contextmenu', e => e.preventDefault());
     });
 
+    MobileSheet.init();
     console.log('[CaptionX] App initialized');
 
     // Automatically show iOS export notice if captureStream unsupported
@@ -5555,23 +5846,10 @@ const App = {
       }
       console.log('[CaptionX] iOS/unsupported browser: video export disabled, caption export available');
     }
-  },
-
-  setTheme(theme) {
-    State.settings.theme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-    document.getElementById('theme-dark-btn').classList.toggle('active', theme === 'dark');
-    document.getElementById('theme-light-btn').classList.toggle('active', theme === 'light');
-    ProjectManager.debouncedAutoSave();
   }
 };
 
-// Start when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => App.init());
-} else {
-  App.init();
-}
+App.init();
 </script>
 </body>
 </html>
