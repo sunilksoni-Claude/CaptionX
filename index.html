@@ -196,7 +196,6 @@ input[type=range] { -webkit-appearance:none; appearance:none }
     box-shadow: -2px 0 24px rgba(0,0,0,0.2);
     position: relative; z-index: 2;
   }
-  #mobile-tabs { display:none }
 }
 /* Tablet */
 @media(min-width:768px) and (max-width:1023px) {
@@ -209,137 +208,115 @@ input[type=range] { -webkit-appearance:none; appearance:none }
   }
   #center-panel { flex:1; display:flex; flex-direction:column; overflow:hidden }
   #right-panel { display:none }
-  #mobile-tabs { display:none }
 }
 /* Mobile */
 @media(max-width:767px) {
-  /* ── App Shell ── */
-  #main-area { flex-direction:column; overflow:hidden; position:relative }
-  #left-panel, #right-panel { display:none }          /* hidden from flow */
-  #center-panel { display:flex; flex-direction:column; flex-shrink:0 }
-  #center-panel.mobile-hidden { display:none }        /* unused but kept */
-  #timeline-panel { display:none }
+  /* Captions-app style mobile layout */
 
-  /* ── Video area: always-visible 16:9 preview ── */
-  #video-area-wrap {
-    width:100%;
-    height: calc(100vw * 9 / 16);
-    max-height: 44vh;
-    flex-shrink: 0;
-    background: #000;
-    position: relative;
-  }
+  /* ── Layout reset ── */
+  #main-area { flex-direction:column; overflow:hidden }
+  #left-panel,#right-panel,#timeline-panel { display:none }
 
-  /* ── Slim video controls on mobile ── */
-  #video-controls { padding:4px 8px }
-  #seek-bar-wrap { height:18px }
-  #volume-wrap, .speed-wrap { display:none }
-
-  /* ── Header: smaller on mobile ── */
-  #header { height:44px; padding:0 10px }
+  /* ── Header: minimal ── */
+  #header { height:44px; padding:0 12px; gap:6px }
+  #logo { font-size:14px; gap:6px }
+  #logo svg { width:20px; height:20px }
   #project-name { display:none }
-  #logo { font-size:15px }
-  #logo svg { width:22px; height:22px }
+  #btn-undo,#btn-redo,#btn-save,#btn-load,#btn-settings,.sep { display:none !important }
+  #btn-export-open { display:flex; margin-left:auto; padding:6px 14px; font-size:12px }
   .header-btn span { display:none }
   .header-btn { padding:6px 8px }
 
-  /* ── Mobile backdrop (behind sheet) ── */
+  /* ── Video area: 16:9 ── */
+  #center-panel { flex-shrink:0; display:flex; flex-direction:column; background:#000 }
+  #video-area-wrap {
+    width:100%; height:calc(100vw * 9/16); max-height:45vh;
+    flex-shrink:0; position:relative; background:#000; overflow:hidden;
+  }
+
+  /* ── Slim video controls ── */
+  #video-controls { padding:3px 10px 4px; flex-shrink:0 }
+  #seek-bar-wrap { height:18px }
+  #volume-wrap,.speed-wrap { display:none }
+  .ctrl-btn { width:34px; height:34px }
+
+  /* ── Hide desktop upload zone ── */
+  #upload-zone { display:none !important }
+
+  /* ── Upload overlay: full-screen onboarding ── */
+  #mobile-upload-overlay {
+    display:flex; position:fixed; inset:0; z-index:500;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:#07071a; gap:0; padding:0; overflow:hidden;
+  }
+
+  /* ── Bottom action bar ── */
+  #mobile-tabs {
+    position:fixed; bottom:0; left:0; right:0; display:flex !important;
+    background:rgba(9,9,20,0.98);
+    backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border-top:1px solid rgba(255,255,255,0.07); z-index:300;
+    padding-bottom:var(--safe-b); height:calc(56px + var(--safe-b));
+    align-items:stretch;
+  }
+  .mobile-tab {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:6px 4px 4px; gap:3px; font-size:9px; font-weight:700;
+    letter-spacing:0.05em; text-transform:uppercase; color:rgba(255,255,255,0.35);
+    border-top:2px solid transparent; transition:color .15s,border-color .15s;
+    -webkit-tap-highlight-color:transparent;
+    background:none; border-left:none; border-right:none; border-bottom:none;
+  }
+  .mobile-tab svg { width:19px; height:19px }
+  .mobile-tab.active { color:var(--accent-2); border-top-color:var(--accent) }
+  .mobile-tab:active { opacity:.55; transform:scale(.93) }
+  .mobile-tab.add-tab { flex:0 0 62px }
+  .mobile-tab.add-tab .tab-add-circle {
+    width:40px; height:40px; border-radius:50%; background:var(--grad-accent);
+    box-shadow:var(--shadow-btn); display:flex; align-items:center; justify-content:center;
+    margin-top:-18px; flex-shrink:0;
+  }
+  .mobile-tab.add-tab .tab-add-circle svg { width:20px; height:20px; color:#fff }
+  .mobile-tab.add-tab .tab-label { font-size:8px; color:rgba(255,255,255,0.3); margin-top:2px }
+
+  /* ── Bottom sheets ── */
+  #left-panel,#right-panel {
+    position:fixed; left:0; right:0; bottom:0;
+    min-height:46vh; max-height:calc(100dvh - 44px - calc(100vw * 9/16) - 8px);
+    z-index:200; display:flex !important; flex-direction:column;
+    border-radius:18px 18px 0 0;
+    background:rgba(12,12,26,0.99);
+    backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid rgba(255,255,255,0.06); border-bottom:none;
+    transform:translateY(105%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    will-change:transform; overflow:hidden;
+    padding-bottom:calc(56px + var(--safe-b));
+  }
+  #left-panel.sheet-open,#right-panel.sheet-open {
+    transform:translateY(0);
+    box-shadow:0 -8px 48px rgba(0,0,0,0.7),0 -1px 0 rgba(124,108,247,0.15);
+  }
+  .sheet-drag-handle {
+    display:flex !important; justify-content:center; align-items:center;
+    padding:10px 0 5px; flex-shrink:0; touch-action:none; user-select:none;
+  }
+  .sheet-handle-bar { width:32px; height:3px; border-radius:2px; background:rgba(255,255,255,0.15) }
+  .panel-header { min-height:40px; padding:8px 14px }
+  .panel-scroll { -webkit-overflow-scrolling:touch }
+
+  /* ── Backdrop ── */
   #mobile-backdrop {
-    position:fixed; inset:0; z-index:199;
-    background:rgba(0,0,0,0.55);
-    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-    display:none; opacity:0;
-    transition:opacity .3s ease;
+    position:fixed; inset:0; z-index:199; background:rgba(0,0,0,0.45);
+    display:none; opacity:0; transition:opacity .25s;
   }
   #mobile-backdrop.visible { display:block; opacity:1 }
 
-  /* ── Panel → bottom sheet ── */
-  #left-panel, #right-panel {
-    position:fixed;
-    left:0; right:0;
-    bottom:0;
-    height: 68vh;
-    max-height: calc(100vh - 120px);
-    z-index:200;
-    display:flex !important;
-    flex-direction:column;
-    border-radius:20px 20px 0 0;
-    background: rgba(14,14,28,0.97);
-    backdrop-filter:var(--glass-blur);
-    -webkit-backdrop-filter:var(--glass-blur);
-    border:1px solid var(--glass-border);
-    border-bottom:none;
-    transform:translateY(110%);
-    transition:transform .35s cubic-bezier(.4,0,.2,1);
-    will-change:transform;
-    overflow:hidden;
-    padding-bottom:calc(60px + var(--safe-b));
-  }
-  #left-panel.sheet-open, #right-panel.sheet-open {
-    transform:translateY(0);
-    box-shadow:0 -8px 40px rgba(0,0,0,0.6), 0 -2px 0 rgba(124,108,247,0.2);
-  }
-
-  /* ── Sheet drag handle ── */
-  .sheet-drag-handle {
-    display:flex !important;
-    justify-content:center; align-items:center;
-    padding:10px 0 6px; flex-shrink:0; cursor:grab;
-    touch-action:none; user-select:none;
-  }
-  .sheet-handle-bar {
-    width:36px; height:4px; border-radius:2px;
-    background:rgba(255,255,255,0.2);
-  }
-
-  /* ── Tab bar ── */
-  #mobile-tabs {
-    position:fixed;
-    bottom:0; left:0; right:0;
-    display:flex !important;
-    background: rgba(10,10,22,0.97);
-    backdrop-filter:var(--glass-blur);
-    -webkit-backdrop-filter:var(--glass-blur);
-    border-top:1px solid var(--glass-border);
-    z-index:300;
-    padding-bottom:var(--safe-b);
-    height:calc(60px + var(--safe-b));
-  }
-  .mobile-tab { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:6px 4px 4px; gap:2px; font-size:9px; font-weight:600; letter-spacing:0.04em;
-    color:var(--text-muted); border-top:2px solid transparent; transition:all .15s ease; -webkit-tap-highlight-color:transparent }
-  .mobile-tab svg { width:20px; height:20px }
-  .mobile-tab.active { color:var(--accent-2); border-top-color:var(--accent) }
-  .mobile-tab:active { opacity:0.6; transform:scale(0.9) }
-
-  /* ── Centre "+" tab ── */
-  .mobile-tab.add-tab { flex:0 0 72px }
-  .mobile-tab.add-tab .tab-add-circle {
-    width:44px; height:44px; border-radius:50%;
-    background:var(--grad-accent);
-    box-shadow:var(--shadow-btn);
-    display:flex; align-items:center; justify-content:center;
-    margin-top:-14px;
-  }
-  .mobile-tab.add-tab .tab-add-circle svg { width:22px; height:22px; color:#fff }
-  .mobile-tab.add-tab .tab-label { font-size:8px; margin-top:1px; color:var(--text-muted) }
-
-  /* ── Spacer so content isn't hidden under tab bar ── */
+  /* ── Spacer ── */
   #mobile-bottom-spacer { display:block !important }
 
-  /* ── Mobile upload overlay ── */
-  #mobile-upload-overlay {
-    display:flex;
-    position:fixed; inset:0; z-index:400;
-    flex-direction:column; align-items:center; justify-content:center;
-    background:rgba(6,6,15,0.98);
-    gap:20px; padding:32px 24px;
-    overflow-y:auto; -webkit-overflow-scrolling:touch;
-  }
-
-  /* ── Upload zone on mobile: simpler ── */
-  #drop-area { padding:28px 20px }
-  #drop-area h2 { font-size:16px }
+  /* ── Style cat strip ── */
+  #style-cat-strip { flex-shrink:0 }
 }
 
 
@@ -1858,6 +1835,7 @@ input[type=range]::-webkit-slider-runnable-track {
   }
 }
 </style>
+
 <link rel='preconnect' href='https://fonts.googleapis.com'>
 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 </head>
@@ -2539,28 +2517,24 @@ input[type=range]::-webkit-slider-runnable-track {
   <!-- Mobile bottom spacer (keeps content above tab bar) -->
   <div id="mobile-bottom-spacer" style="display:none;height:calc(60px + env(safe-area-inset-bottom,0px));flex-shrink:0"></div>
 
-  <!-- Mobile Tab Bar -->
+  <!-- Mobile Action Bar -->
   <div id="mobile-tabs">
-    <button class="mobile-tab" data-mtab="upload" id="mtab-upload">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 13V4M7 7l3-3 3 3"/><path d="M3 14v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg>
-      Upload
-    </button>
     <button class="mobile-tab" data-mtab="captions" id="mtab-captions">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 10a2 2 0 0 1-2 2H6l-3 3V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v6z"/></svg>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 11a2 2 0 0 1-2 2H6l-3 3V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v7z"/></svg>
       Captions
     </button>
     <button class="mobile-tab add-tab" id="mtab-add">
       <div class="tab-add-circle">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 4v12M4 10h12"/></svg>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M10 4v12M4 10h12"/></svg>
       </div>
       <span class="tab-label">Add</span>
     </button>
     <button class="mobile-tab" data-mtab="style" id="mtab-style">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17l3-3 9-9-3-3-9 9-3 3 3 3z"/><path d="M14 5l2 2"/></svg>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13.5 3.5a4.95 4.95 0 0 1 3 3L8 15H5v-3L13.5 3.5z"/><path d="M11 6l3 3"/></svg>
       Style
     </button>
     <button class="mobile-tab" data-mtab="export" id="mtab-export">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2v10M7 9l3 3 3-3M3 15v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2v9M7 8l3 3 3-3M4 14v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2"/></svg>
       Export
     </button>
   </div>
@@ -5806,9 +5780,9 @@ const MobileSheet = {
       });
     }
 
-    // Show mobile overlay on ALL mobile when no video loaded
-    if (window.innerWidth <= 767) {
-      overlay?.classList.remove('hidden');
+    // Show upload overlay on mobile when no video loaded
+    if (window.innerWidth <= 767 && !State.videoLoaded) {
+      if (overlay) overlay.classList.remove('hidden');
     }
   }
 };
